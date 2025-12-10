@@ -41,6 +41,7 @@ const App = () => {
     },
   ]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [winner, setWinner] = useState("");
   const listRefs = useRef([]);
 
   useEffect(() => {
@@ -51,8 +52,7 @@ const App = () => {
     });
   }, [players]);
 
-  const updatePlayerCount = (e) => {
-    const count = parseInt(e.target.value, 10);
+  const setCountAndPlayers = (count) => {
     setPlayerCount(count);
 
     const newPlayers = [];
@@ -68,11 +68,17 @@ const App = () => {
     setPlayers(newPlayers);
   };
 
+  const updatePlayerCount = (e) => {
+    const count = parseInt(e.target.value, 10);
+    setCountAndPlayers(count);
+  };
+
   const playGame = async () => {
     setGameStarted(true);
     let mostAdvancedSpace = 0;
     let playerTurnIndex = 0;
     let tempPlayers = structuredClone(players);
+    let winner;
 
     while (mostAdvancedSpace < 100) {
       let currentPlayer = tempPlayers[playerTurnIndex];
@@ -123,13 +129,22 @@ const App = () => {
       mostAdvancedSpace = tempPlayers.reduce((acc, player) => {
         if (player.currentPosition > acc) {
           acc = player.currentPosition;
+          winner = player.name;
         }
         return acc;
       }, 0);
 
       setPlayers([...tempPlayers]);
-      await sleep(200); // Speed increased slightly for effect
+      await sleep(200);
     }
+
+    setWinner(winner);
+  };
+
+  const resetGame = () => {
+    setGameStarted(false);
+    setCountAndPlayers(2);
+    setWinner("");
   };
 
   return (
@@ -139,7 +154,8 @@ const App = () => {
           <div className="gameHeader">
             <h3>Chutes and Ladders</h3>
             <p>
-              Want to play Chutes and Ladders, but don't have the time? Play it here!
+              Want to play Chutes and Ladders, but don't have the time? Play it
+              here!
             </p>
           </div>
 
@@ -185,6 +201,16 @@ const App = () => {
               </div>
             ))}
           </div>
+          {winner && (
+            <div className="winner-modal-overlay">
+              <div className="winner-modal-box">
+                {winner} wins!
+                <button className="playButton againButton" onClick={resetGame}>
+                  AGAIN
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
