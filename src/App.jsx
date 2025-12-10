@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import "./App.css";
 
 const board = {
   1: 38,
@@ -30,28 +31,46 @@ const App = () => {
       name: "Player 1",
       currentPosition: 0,
       story: [],
+      colorClass: "player-1",
     },
     {
       name: "Player 2",
       currentPosition: 0,
       story: [],
+      colorClass: "player-2",
     },
   ]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [winner, setWinner] = useState("");
+  const listRefs = useRef([]);
 
-  const updatePlayerCount = (e) => {
-    setPlayerCount(e.target.value);
+  useEffect(() => {
+    listRefs.current.forEach((list) => {
+      if (list) {
+        list.scrollTop = list.scrollHeight;
+      }
+    });
+  }, [players]);
+
+  const setCountAndPlayers = (count) => {
+    setPlayerCount(count);
 
     const newPlayers = [];
-    for (let i = 0; i < e.target.value; i++) {
+    for (let i = 0; i < count; i++) {
       newPlayers.push({
         name: `Player ${i + 1}`,
         currentPosition: 0,
         story: [],
+        colorClass: `player-${i + 1}`,
       });
     }
 
     setPlayers(newPlayers);
+  };
+
+  const updatePlayerCount = (e) => {
+    const count = parseInt(e.target.value, 10);
+    setCountAndPlayers(count);
   };
 
   const playGame = async () => {
@@ -59,6 +78,7 @@ const App = () => {
     let mostAdvancedSpace = 0;
     let playerTurnIndex = 0;
     let tempPlayers = structuredClone(players);
+    let winner;
 
     while (mostAdvancedSpace < 100) {
       let currentPlayer = tempPlayers[playerTurnIndex];
@@ -109,59 +129,91 @@ const App = () => {
       mostAdvancedSpace = tempPlayers.reduce((acc, player) => {
         if (player.currentPosition > acc) {
           acc = player.currentPosition;
+          winner = player.name;
         }
         return acc;
       }, 0);
 
       setPlayers([...tempPlayers]);
-      await sleep(500);
+      await sleep(200);
     }
+
+    setWinner(winner);
+  };
+
+  const resetGame = () => {
+    setGameStarted(false);
+    setCountAndPlayers(2);
+    setWinner("");
   };
 
   return (
-    <>
-      <div className="startScreen">
-        <div className="gameDesc">
-          <h3>Chutes and Ladders</h3>
-          <p>
-            The game "Chutes and Ladders" requires no player choice. It is,
-            effectively, a complicated coin flip. Play it here and save time.
-          </p>
-        </div>
-
-        <div className="gameForm">
-          <div className="playerCount">
-            <label>
-              {" "}
-              How many players?{" "}
-              <select onChange={updatePlayerCount} value={playerCount}>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-                <option value="4">Four</option>
-              </select>
-            </label>
+    <div className="gameWrapper">
+      {!gameStarted ? (
+        <div className="startCard">
+          <div className="gameHeader">
+            <h3>Chutes and Ladders</h3>
+            <p>
+              Want to play Chutes and Ladders, but don't have the time? Play it
+              here!
+            </p>
           </div>
 
-          <button className="startButton" onClick={playGame}>
-            Play!
-          </button>
+          <div className="gameControls">
+            <div className="playerSelect">
+              <label>
+                SELECT PLAYERS:
+                <select onChange={updatePlayerCount} value={playerCount}>
+                  <option value="2">Two (2)</option>
+                  <option value="3">Three (3)</option>
+                  <option value="4">Four (4)</option>
+                </select>
+              </label>
+            </div>
+
+            <button className="playButton" onClick={playGame}>
+              START
+            </button>
+          </div>
         </div>
-      </div>
-      {gameStarted && (
-        <div className="wholeRecap">
-          <h3>Chutes and Ladders</h3>
-          <div className="storiesContainer">
+      ) : (
+        <div className="boardContainer">
+          <div className="boardHeader">
+            <h3>RACE IN PROGRESS</h3>
+          </div>
+          <div className="playerColumns">
             {players.map((player, playerIndex) => (
-              <ul className="playerStory" key={playerIndex}>
-                {player.story.map((leg, legIndex) => (
-                  <li key={legIndex}>{leg}</li>
-                ))}
-              </ul>
+              <div
+                className={`playerColumn ${player.colorClass}`}
+                key={playerIndex}
+              >
+                <div className="playerTokenHeader">
+                  <span className="tokenIcon">♟</span> {player.name}
+                </div>
+                <ul
+                  className="storyList"
+                  ref={(el) => (listRefs.current[playerIndex] = el)}
+                >
+                  {player.story.map((leg, legIndex) => (
+                    <li key={legIndex}>{leg}</li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
+          {winner && (
+            <div className="winner-modal-overlay">
+              <div className="winner-modal-box">
+                {winner} wins!
+                <button className="playButton againButton" onClick={resetGame}>
+                  AGAIN
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
