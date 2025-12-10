@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import "./App.css";
 
 const board = {
   1: 38,
@@ -30,24 +31,37 @@ const App = () => {
       name: "Player 1",
       currentPosition: 0,
       story: [],
+      colorClass: "player-1",
     },
     {
       name: "Player 2",
       currentPosition: 0,
       story: [],
+      colorClass: "player-2",
     },
   ]);
   const [gameStarted, setGameStarted] = useState(false);
+  const listRefs = useRef([]);
+
+  useEffect(() => {
+    listRefs.current.forEach((list) => {
+      if (list) {
+        list.scrollTop = list.scrollHeight;
+      }
+    });
+  }, [players]);
 
   const updatePlayerCount = (e) => {
-    setPlayerCount(e.target.value);
+    const count = parseInt(e.target.value, 10);
+    setPlayerCount(count);
 
     const newPlayers = [];
-    for (let i = 0; i < e.target.value; i++) {
+    for (let i = 0; i < count; i++) {
       newPlayers.push({
         name: `Player ${i + 1}`,
         currentPosition: 0,
         story: [],
+        colorClass: `player-${i + 1}`,
       });
     }
 
@@ -114,7 +128,7 @@ const App = () => {
       }, 0);
 
       setPlayers([...tempPlayers]);
-      await sleep(500);
+      await sleep(200); // Speed increased slightly for effect
     }
   };
 
@@ -125,40 +139,45 @@ const App = () => {
           <div className="gameHeader">
             <h3>Chutes and Ladders</h3>
             <p>
-              The game "Chutes and Ladders" requires no player choice. It is,
-              effectively, a complicated coin flip. Play it here and save time.
+              Want to play Chutes and Ladders, but don't have the time? Play it here!
             </p>
           </div>
 
           <div className="gameControls">
             <div className="playerSelect">
               <label>
-                Number of Players:
+                SELECT PLAYERS:
                 <select onChange={updatePlayerCount} value={playerCount}>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                  <option value="4">Four</option>
+                  <option value="2">Two (2)</option>
+                  <option value="3">Three (3)</option>
+                  <option value="4">Four (4)</option>
                 </select>
               </label>
             </div>
 
             <button className="playButton" onClick={playGame}>
-              START GAME
+              START
             </button>
           </div>
         </div>
       ) : (
         <div className="boardContainer">
           <div className="boardHeader">
-            <h3>Game in Progress...</h3>
+            <h3>RACE IN PROGRESS</h3>
           </div>
           <div className="playerColumns">
             {players.map((player, playerIndex) => (
-              <div className="playerColumn" key={playerIndex}>
+              <div
+                className={`playerColumn ${player.colorClass}`}
+                key={playerIndex}
+              >
                 <div className="playerTokenHeader">
-                  {player.name}
+                  <span className="tokenIcon">♟</span> {player.name}
                 </div>
-                <ul className="storyList">
+                <ul
+                  className="storyList"
+                  ref={(el) => (listRefs.current[playerIndex] = el)}
+                >
                   {player.story.map((leg, legIndex) => (
                     <li key={legIndex}>{leg}</li>
                   ))}
