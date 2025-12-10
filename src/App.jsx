@@ -119,49 +119,56 @@ const App = () => {
   };
 
   return (
-    <>
-      <div className="startScreen">
-        <div className="gameDesc">
-          <h3>Chutes and Ladders</h3>
-          <p>
-            The game "Chutes and Ladders" requires no player choice. It is,
-            effectively, a complicated coin flip. Play it here and save time.
-          </p>
-        </div>
-
-        <div className="gameForm">
-          <div className="playerCount">
-            <label>
-              {" "}
-              How many players?{" "}
-              <select onChange={updatePlayerCount} value={playerCount}>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-                <option value="4">Four</option>
-              </select>
-            </label>
+    <div className="gameWrapper">
+      {!gameStarted ? (
+        <div className="startCard">
+          <div className="gameHeader">
+            <h3>Chutes and Ladders</h3>
+            <p>
+              The game "Chutes and Ladders" requires no player choice. It is,
+              effectively, a complicated coin flip. Play it here and save time.
+            </p>
           </div>
 
-          <button className="startButton" onClick={playGame}>
-            Play!
-          </button>
+          <div className="gameControls">
+            <div className="playerSelect">
+              <label>
+                Number of Players:
+                <select onChange={updatePlayerCount} value={playerCount}>
+                  <option value="2">Two</option>
+                  <option value="3">Three</option>
+                  <option value="4">Four</option>
+                </select>
+              </label>
+            </div>
+
+            <button className="playButton" onClick={playGame}>
+              START GAME
+            </button>
+          </div>
         </div>
-      </div>
-      {gameStarted && (
-        <div className="wholeRecap">
-          <h3>Chutes and Ladders</h3>
-          <div className="storiesContainer">
+      ) : (
+        <div className="boardContainer">
+          <div className="boardHeader">
+            <h3>Game in Progress...</h3>
+          </div>
+          <div className="playerColumns">
             {players.map((player, playerIndex) => (
-              <ul className="playerStory" key={playerIndex}>
-                {player.story.map((leg, legIndex) => (
-                  <li key={legIndex}>{leg}</li>
-                ))}
-              </ul>
+              <div className="playerColumn" key={playerIndex}>
+                <div className="playerTokenHeader">
+                  {player.name}
+                </div>
+                <ul className="storyList">
+                  {player.story.map((leg, legIndex) => (
+                    <li key={legIndex}>{leg}</li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
