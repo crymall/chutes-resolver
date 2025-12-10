@@ -6,40 +6,17 @@
   --bg-color: #fff8e7; /* Parchment-ish */
   --border-dark: #231f20;
   --retro-shadow: 8px 8px 0px var(--border-dark);
-
-  /* checkerboard background variables */
-  --banana-yellow: #ffe135;
-  --beige-yellow: #f5f5dc;
-  --line-color: #000000;
-  --line-width: 1px;
-  --tile-size: 60px;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--beige-yellow);
-
-  background-image: linear-gradient(
-      to bottom,
-      var(--line-color) var(--line-width),
-      transparent var(--line-width)
-    ),
-    linear-gradient(
-      to right,
-      var(--line-color) var(--line-width),
-      transparent var(--line-width)
-    ),
-    conic-gradient(
-      var(--banana-yellow) 90deg,
-      var(--beige-yellow) 90deg 180deg,
-      var(--banana-yellow) 180deg 270deg,
-      var(--beige-yellow) 270deg
-    );
-  background-size: calc(var(--tile-size) / 2) calc(var(--tile-size) / 2),
-    calc(var(--tile-size) / 2) calc(var(--tile-size) / 2),
-    var(--tile-size) var(--tile-size);
-
+  background-color: #f5f5dc;
+  background-image: 
+    linear-gradient(black 1px, transparent 1px),
+    linear-gradient(90deg, black 1px, transparent 1px),
+    conic-gradient(#ffe135 90deg, #f5f5dc 90deg 180deg, #ffe135 180deg 270deg, #f5f5dc 270deg);
+  background-size: 45px 45px, 45px 45px, 90px 90px;
   background-position: 0 0;
   font-family: "Instrument Sans", sans-serif;
   color: var(--border-dark);
