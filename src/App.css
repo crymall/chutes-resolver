@@ -201,13 +201,12 @@ select {
   list-style: none;
   margin: 0;
   padding: 15px;
-  overflow-y: scroll; /* Scroll inside the fixed container */
+  overflow-y: scroll;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* Scrollbar Styling for that retro plastic feel */
 .storyList::-webkit-scrollbar {
   width: 12px;
 }
@@ -230,7 +229,6 @@ select {
   line-height: 1.3;
 }
 
-/* Highlight special events */
 .storyList li:last-child {
   border-color: var(--border-dark);
   background-color: #fff;
